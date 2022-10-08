@@ -7,7 +7,7 @@ CONSUMIDORES = 2 #Número de consumidores
 PRODUCTO_INIT = 0
 
 buffer = [] #Bodega
-mutex = threading.Lock() #Exclusión mutua al insertar o quitar elementos
+mutex = threading.Lock() 
 notEmpty = threading.Semaphore(0) #Bloquear a los consumidores cuando no haya productos
       
 class Productor(threading.Thread):

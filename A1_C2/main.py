@@ -2,11 +2,11 @@ import threading
 import time
 
 PRODUCTORES = 1 #Número de productores
-CONSUMIDORES = 2 #Número de consumidores
-PRODUCTO_INIT = 0
+CONSUMIDORES = 10 #Número de consumidores
+producto_bodega = 0
 
 buffer = [] #Bodega
-mutex = threading.Lock() #Exclusión mutua al insertar o quitar elementos
+mutex = threading.Lock() 
 notEmpty = threading.Semaphore(0) #Bloquear a los consumidores cuando no haya productos
       
 class Productor(threading.Thread):
@@ -18,15 +18,15 @@ class Productor(threading.Thread):
     Productor.conta += 1
   
   def productor(self):
-    global PRODUCTO_INIT
+    global producto_bodega
     while True:
       with mutex:
-        buffer.append(PRODUCTO_INIT) #Almacena un producto
-        PRODUCTO_INIT +=1
-        print("Productor ", (self.id)," almacena un producto")
+        buffer.append(producto_bodega) #Almacena un producto
+        producto_bodega +=1
+        print("\nProductor ", (self.id)," almacena un producto")
+        print("Productos en bodega:",len(buffer))
         time.sleep(2)
       notEmpty.release()
-      print("Productos en bodega:",len(buffer))
       
   def run(self):
     self.productor()
@@ -40,15 +40,13 @@ class Consumidor(threading.Thread):
     Consumidor.conta += 1
   
   def consumidor(self):
-    global PRODUCTO_INIT
     while True:
       notEmpty.acquire()
-      time.sleep(2)
       with mutex:
-        aux = buffer.pop(0)
-        print("Consumidor ", (self.id)," extrae un producto")
-        PRODUCTO_INIT +=1
-      print("Productos en bodega:",len(buffer))
+        buffer.pop(0)
+        print("\nConsumidor ", (self.id)," extrae un producto")
+        print("Productos en bodega:",len(buffer),"\n")
+        time.sleep(2)
 
   def run(self):
     self.consumidor()
@@ -56,10 +54,10 @@ class Consumidor(threading.Thread):
 def main():
     personas = []
 
-    for i in range(CONSUMIDORES):
+    for i in range(PRODUCTORES):
       personas.append(Productor())
       
-    for i in range(PRODUCTORES):
+    for i in range(CONSUMIDORES):
       personas.append(Consumidor())
 
     for t in personas:
