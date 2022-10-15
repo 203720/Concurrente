@@ -1,13 +1,13 @@
+import random
 import threading
 import time
 
-PRODUCTORES = 1 #Número de productores
-CONSUMIDORES = 10 #Número de consumidores
-producto_bodega = 0
+PRODUCTORES = 5 #Número de productores
+CONSUMIDORES = 5 #Número de consumidores
+MAX_BUFFER = 50
 
 buffer = [] #Bodega
-mutex = threading.Lock() 
-notEmpty = threading.Semaphore(0) #Bloquear a los consumidores cuando no haya productos
+consumirProductos = threading.Semaphore(0)
       
 class Productor(threading.Thread):
   conta = 0
@@ -17,19 +17,20 @@ class Productor(threading.Thread):
     self.id  = Productor.conta
     Productor.conta += 1
   
-  def productor(self):
-    global producto_bodega
+  def producir(self):
     while True:
-      with mutex:
-        buffer.append(producto_bodega) #Almacena un producto
-        producto_bodega +=1
-        print("\nProductor ", (self.id)," almacena un producto")
-        print("Productos en bodega:",len(buffer))
-        time.sleep(2)
-      notEmpty.release()
+      if MAX_BUFFER > len(buffer):
+        item = random.randint(0,100)
+        buffer.append(item)
+        print(f"Productor  {self.id} almacena producto: [{item}]. Productos en bodega: {buffer}")
+        consumirProductos.release()
+      else:
+        print(f"Bodega llena. Productor {self.id} esperando")
+      time.sleep(3)
       
   def run(self):
-    self.productor()
+    for _ in range(PRODUCTORES):
+      self.producir()
       
 class Consumidor(threading.Thread):
   conta = 0
@@ -39,29 +40,35 @@ class Consumidor(threading.Thread):
     self.id  = Consumidor.conta
     Consumidor.conta += 1
   
-  def consumidor(self):
-    while True:
-      notEmpty.acquire()
-      with mutex:
-        buffer.pop(0)
-        print("\nConsumidor ", (self.id)," extrae un producto")
-        print("Productos en bodega:",len(buffer),"\n")
-        time.sleep(2)
+  def consumir(self):
+    while True:     
+      if len(buffer)>0:
+        item = buffer.pop()
+        print(f"Consumidor  {self.id} extrae producto: [{item}]. Productos en bodega: {buffer}\n")
+        consumirProductos.acquire()
+      else:
+        print(f"Bodega vacia. Consumidor {self.id} esperando")
+      time.sleep(3) 
 
   def run(self):
-    self.consumidor()
+    for _ in range(CONSUMIDORES):
+      self.consumir()
   
-def main():
-    personas = []
+def main():    
+  productores = []
+  consumidores = []
 
-    for i in range(PRODUCTORES):
-      personas.append(Productor())
+  for i in range(PRODUCTORES):
+    productores.append(Productor())
       
-    for i in range(CONSUMIDORES):
-      personas.append(Consumidor())
+  for i in range(CONSUMIDORES):
+    consumidores.append(Consumidor())
 
-    for t in personas:
-        t.start()
+  for p in productores:
+    p.start()
+    
+  for c in consumidores:
+    c.start()
 
 if __name__ == "__main__":
     main()
