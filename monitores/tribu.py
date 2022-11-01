@@ -11,11 +11,11 @@ miembro = threading.Condition(mutex)
 cocinero = threading.Condition(mutex)
 
 class Miembros(threading.Thread):
-  conta = 0
+  conta = 1
   def __init__(self):
     super(Miembros, self).__init__()
     self.id  = Miembros.conta
-    Miembros.conta += 0
+    Miembros.conta += 1
 
   def comer(self):
     with mutex:
@@ -35,7 +35,7 @@ class Cocineros(threading.Thread):
   
   def __init__(self):
     super(Cocineros, self).__init__()
-    self.id  = 0
+    self.id  = 1
     
   def cocinar(self):
     if len(olla) == 0:
