@@ -9,6 +9,8 @@ RESERVACION_MAX = round(AFORO*0.20)
 MESEROS = round(AFORO * 0.10)
 COCINEROS = round(AFORO * 0.10)
 
+accion = ["Reservar", "Cola"]
+
 class Restaurante():
   mutex = threading.Lock()
   clientes = threading.Condition()
@@ -27,7 +29,7 @@ class Restaurante():
   def en_cola(self, cliente):
     self.clientes_reservacion.acquire()
     print(f"Cliente {cliente.id} está en la cola, paga cover\n")
-    time.sleep(1)
+    time.sleep(2)
     self.mutex.acquire()
     self.entrar(cliente)
     self.clientes_reservacion.notify()
@@ -55,7 +57,7 @@ class Restaurante():
       self.clientes.wait()
     else:
       print(f"Cliente {cliente.id} entra a UPPRO\n")
-      time.sleep(1)
+      time.sleep(2)
       self.adentro.put(cliente)
       print(f"El recepcionista asigna una mesa a el cliente {cliente.id}\n")
       self.mesero.acquire()
@@ -66,43 +68,43 @@ class Restaurante():
 
   def ordenar(self, mesero):
     while True:
-      time.sleep(0.5)
+      time.sleep(2)
       self.mesero.acquire()
       if self.adentro.empty():
         print(f"Mesero {mesero.id} está descansando Zzz\n")
         self.mesero.wait()
       else:
         cliente = self.adentro.get()
-        if cliente.atendido == False:
-          print(f"Mesero {mesero.id} tomando orden a cliente {cliente.id}\n")
-          time.sleep(1)
+        if cliente.atendido == "no":
+          print(f"Mesero {mesero.id} tomando orden a cliente {cliente.id}...\n")
+          time.sleep(2)
           print(f"El pedido del cliente {cliente.id} se añadió a la lista de ordenes\n")
           self.ordenes.put(cliente.id)
           self.cocinero.acquire()
           self.cocinero.notify()
           self.cocinero.release()
-          cliente.atendido = True
+          cliente.atendido = "si"
           self.mesero.release()
         else:
           self.mesero.release()
 
   def cocinar(self, cocinero):
     while True:
-      time.sleep(0.5)
+      time.sleep(2)
       self.cocinero.acquire()
       if self.ordenes.empty():
-        print(f"Cocinero {cocinero.id} está descansando\n")
+        print(f"Cocinero {cocinero.id} está descansando Zzz\n")
         self.cocinero.wait()
       else:
         orden = self.ordenes.get()
-        print(f"Cocinero {cocinero.id} preparando orden de cliente {orden}\n")
+        print(f"Cocinero {cocinero.id} preparando orden de cliente {orden}...\n")
         time.sleep(2)
-        print(f"La orden del cliente {orden} está listo\n")
+        print(f"La orden del cliente {orden} está lista!\n")
         self.comidas.put(orden)
         self.cocinero.release()
 
   def comer(self):
-    time.sleep(0.5)
+    time.sleep(2)
     if not self.comidas.empty():
       cliente = self.comidas.get()
       print(f"Cliente {cliente} está comiendo...\n")
@@ -113,17 +115,17 @@ class Restaurante():
 
 class Cliente(threading.Thread):
   conta = 1
-  atendido = False
+  atendido = "no"
 
-  def __init__(self, reservacion):
+  def __init__(self):
     super(Cliente, self).__init__()
     self.id = Cliente.conta
-    self.reservacion = reservacion
     Cliente.conta += 1
 
   def run(self):
-    time.sleep(0.2)
-    if self.reservacion:
+    time.sleep(2)
+    decision = random.choice(accion)
+    if decision == "Reservar":
       restaurante.reservacion(self)
     else:
       restaurante.en_cola(self)
@@ -160,8 +162,7 @@ def main():
   print(f"\nBienvenido a UPPRO\n")
 
   for i in range(CLIENTES):
-    con_reservacion = bool(random.choice([0, 0, 1]))
-    threads.append(Cliente(con_reservacion))
+    threads.append(Cliente())
     
   for i in range(MESEROS):
     threads.append(Mesero())
