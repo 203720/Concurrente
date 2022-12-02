@@ -1,5 +1,5 @@
 import socket, pickle
-from settings import port, server
+from settings import port,server
 from components import *
 
 class Network():
@@ -32,3 +32,5 @@ class Network():
 				return recv 
 		except Exception as e:
 			print(e)
+
+

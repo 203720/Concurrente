@@ -1,8 +1,8 @@
 import socket 
 import pickle 
-from _thread import * 
+import threading
 from components import *
-from settings import server,port
+from settings import server, port
 
 
 HEADERSIZE = 10
@@ -30,13 +30,13 @@ def threaded_client(conn , p, game_id):
 	print("threaded client created")
 
 	if p == 0 :
-		color = blue
+		color = random.choice(clr_list_1)
 		games[game_id].snakes[p] = Snake(random.randint(3,rows//2),random.randint(3,cols//2),snake_head_width,snake_head_height,color,str(color),random.choice(headings),G)
 	else:
 		games[game_id].ready = True
 		games[game_id].a = Apple(G)
 		games[game_id].g = G
-		color = red
+		color = random.choice(clr_list_2)
 		games[game_id].snakes[p] = Snake(random.randint(rows//2 + 1, rows - 4),random.randint(cols//2 +1,cols - 4),snake_head_width,snake_head_height,color,str(color),random.choice(headings),G)
 
 
@@ -155,10 +155,10 @@ while True:
 		# game exists for this client and joining it
 		else:
 			print("Joing on going game")
-			p = 1		
+			p = 1	
 
-		start_new_thread(threaded_client, (conn,p,game_id))
-
+		thread = threading.Thread(target=threaded_client,args=(conn,p, game_id))
+		thread.start()
 
 
 

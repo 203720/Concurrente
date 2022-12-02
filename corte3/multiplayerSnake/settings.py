@@ -1,8 +1,10 @@
 import socket
 
 width = 800
-height = 450
+height = 600
 wall_thickness = 13
+
+
 
 black = (0,0,0)
 white = (255,255,255)
@@ -19,17 +21,17 @@ blue = (0, 0, 255)
 green_2 = (99, 166, 92)
 
 wall_color = green_2
-snake_head_width = 30
-snake_head_height = 30
+snake_head_width = 24
+snake_head_height = 24
 
 wall_info = (wall_thickness,width,height)
 
 partition_color = green_2
 partition_thickness = 1
 
-cell_thickness = 40
+cell_thickness = 24
 
-rows = 24
+rows = 23
 cols = 31
 
 headings = ['U','L','R','D']

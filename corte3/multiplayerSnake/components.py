@@ -24,7 +24,7 @@ class cell():
 	def __init__(self,x,y,width,height):
 		self.x = x
 		self.y = y
-		self.color = (167,209,61)
+		self.color = green_2
 		self.width = width
 		self.height = height
 		self.rect = (x, y, width, height)
@@ -62,7 +62,7 @@ class Snake():
 		self.vel = 1
 		self.body = []
 		self.frame_count = 0
-		self.frame_bound = 8
+		self.frame_bound = 4
 
 	def move(self):
 		if self.moving:
@@ -301,19 +301,19 @@ class EndScreen():
 		self.s2 = s2
 		if self.won:
 			#won
-			self.t = Text("Has ganado!!!!", green, 35,height/2 -100)
+			self.t = Text("Has ganado!!!!", black, 20,height/2 -100)
 
 		else:
 			#lost
-			self.t = Text("Has perido....", red, 35,height/2 -100)
+			self.t = Text("Has perdido....", black, 20,height/2 -100)
 
-		self.score = Text("Tu puntuación : "+str(s1.score)+"    "+"Puntuación de tú rival : "+str(s2.score),black , 35 , height/2)	
-		self.press_enter = Text("Presiona enter para volver a jugar", green, 35,height/2 +100)
+		self.score = Text("Tu puntaje: "+str(s1.score)+"    "+"Puntaje de rival : "+str(s2.score),black , 15 , height/2)	
+		self.press_enter = Text("Presiona enter para volver a jugar", black, 20,height/2 +100)
 
 
 
 	def draw(self,win):
-		win.fill(black)
+		win.fill((167,209,61))
 		self.t.draw(win)
 		self.score.draw(win)
 		self.press_enter.draw(win)
